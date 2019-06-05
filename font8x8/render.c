@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <avr/pgmspace.h>
 
 #include "font8x8_basic.h"
 
@@ -7,7 +9,7 @@ void usage(char *exec) {
     printf("       <char_code> Decimal character code between 0 and 127\n");
 }
 
-void render(char *bitmap) {
+void render(const char *bitmap) {
     int x,y;
     int set;
     int mask;
@@ -31,7 +33,7 @@ int main(int argc, char **argv) {
         usage(argv[0]);
         return 2;
     }
-    char *bitmap = font8x8_basic[ord];
+    const char *bitmap = font8x8_basic[ord];
     
     render(bitmap);
     return 0;

@@ -1,5 +1,7 @@
 #include "TroykaLedMatrix.h"
 
+#include <stdlib.h>
+
 TroykaLedMatrix::TroykaLedMatrix() {
     _addr = I2C_ADDR_BASE | (I2C_ADDR_ALT0 & I2C_ADDR_MASK);
 }
@@ -105,6 +107,17 @@ void TroykaLedMatrix::setMatrixSize(const uint8_t value) {
     }
 }
 
+void TroykaLedMatrix::invertRow(const uint8_t y, uint8_t bit_mask)
+{
+    uint8_t j = y % MATRIX_MAX_ROWS;
+    _data[j] ^= bit_mask;
+    _updateDisplay();
+}
+
+void TroykaLedMatrix::update() {
+    _updateDisplay();
+}
+
 void TroykaLedMatrix::clear() {
     for (uint8_t i = 0; i < MATRIX_MAX_ROWS; i++) {
         _data[i] = 0;
@@ -112,16 +125,43 @@ void TroykaLedMatrix::clear() {
     _updateDisplay();
 }
 
-void TroykaLedMatrix::clearPixel(const uint8_t x, const uint8_t y) {
+void TroykaLedMatrix::clearPixel(const uint8_t x, const uint8_t y, bool update) {
     uint8_t i = x % 8;
     uint8_t j = y % MATRIX_MAX_ROWS;
     _data[j] = _data[j] & ~_BV(i);
+
+    if(update)
+        _updateDisplay();
 }
 
-void TroykaLedMatrix::drawPixel(const uint8_t x, const uint8_t y) {
+void TroykaLedMatrix::drawPixel(const uint8_t x, const uint8_t y, bool update) {
     uint8_t i = x % 8;
     uint8_t j = y % MATRIX_MAX_ROWS;
     _data[j] = _data[j] | _BV(i);
+
+    if(update)
+        _updateDisplay();
+}
+
+uint8_t reverse_bits(uint8_t b) {
+    return ((b * 0x0802L & 0x22110L) | (b * 0x8020L & 0x88440L)) * 0x10101L >> 16;
+}
+
+void TroykaLedMatrix::drawColumn(const uint8_t n, uint8_t bit_mask) {
+    uint8_t v = 1 << n;
+    for(int i = 0; i < 8; i++) {
+        uint8_t bit = bit_mask & (1 << i);
+        if(bit)
+            _data[i] |= v;
+        else
+            _data[i] &= (~v);
+    }
+    _updateDisplay();
+}
+
+void TroykaLedMatrix::drawRow(const uint8_t n, uint8_t bit_mask) {
+    uint8_t y = n % MATRIX_MAX_ROWS;
+    _data[y] = reverse_bits(bit_mask);
     _updateDisplay();
 }
 

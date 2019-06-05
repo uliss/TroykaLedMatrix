@@ -118,8 +118,8 @@ public:
     void clear();
     void selectFont(const uint8_t fontID);
     void setFont(const uint8_t* font, const uint8_t countChars = 1, const uint8_t countRaws = 8);
-    void clearPixel(const uint8_t x, const uint8_t y);
-    void drawPixel(const uint8_t x, const uint8_t y);
+    void clearPixel(const uint8_t x, const uint8_t y, bool update = true);
+    void drawPixel(const uint8_t x, const uint8_t y, bool update = true);
     void drawSymbol(const uint8_t c);
     void drawBitmap(const uint8_t* data, const bool reverse = true, const uint8_t countRaws = 8);
     void marquee(const uint8_t data[][8], const int len, const int sh, const bool reverse = true);
@@ -127,6 +127,11 @@ public:
     byte map(long input, long in_min, long in_max);
     void marqueeText(char text[], uint8_t len, uint16_t sh);
     void setRotation(const uint8_t value);
+
+    void drawColumn(const uint8_t n, uint8_t bit_mask);
+    void drawRow(const uint8_t n, uint8_t bit_mask);
+    void invertRow(const uint8_t y, uint8_t bit_mask);
+    void update();
 
 private:
     void _init();
